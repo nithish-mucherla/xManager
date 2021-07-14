@@ -7,6 +7,7 @@ import auth from '@react-native-firebase/auth';
 import HomeScreenStack from './screens/home/home';
 import {createStackNavigator} from '@react-navigation/stack';
 import SuccessScreen from './screens/successScreen.js';
+import TxnInfo from './screens/txnInfo/TxnInfo.js';
 
 const HomeStack = createStackNavigator();
 
@@ -50,6 +51,11 @@ export default function App() {
         <HomeStack.Screen
           name="TxnSuccess"
           component={SuccessScreen}
+          options={{headerShown: false}}
+        />
+        <HomeStack.Screen
+          name="TxnInfo"
+          component={TxnInfo}
           options={{headerShown: false}}
         />
       </HomeStack.Navigator>

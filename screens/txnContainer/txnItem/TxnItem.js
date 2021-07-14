@@ -10,12 +10,7 @@ const TxnItem = ({id, txnDetails, navigation}) => {
   return (
     <TouchableOpacity
       key={id}
-      onPress={() =>
-        navigation.navigate('TxnForm', {
-          screen: 'Add Transaction',
-          params: {txnId: id, txnType: 'edit'},
-        })
-      }>
+      onPress={() => navigation.navigate('TxnInfo', {txnId: id})}>
       <View style={styles.itemContainer}>
         <View
           style={{
