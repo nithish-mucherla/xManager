@@ -1,22 +1,20 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {useState, useRef, useEffect} from 'react';
+import {useState} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   ScrollView,
   Image,
-  Dimensions,
   StyleSheet,
-  Animated,
 } from 'react-native';
 import Button from '../../components/Button';
 import globalStyles from '../../App.component.styles';
 import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/auth';
 import CustomTextInput from '../../components/TextInput';
+import BottomActionBar from '../../components/BottomActionBar';
 
 const TxnForm = ({route, navigation}) => {
   const [title, setTitle] = useState('');
@@ -26,39 +24,7 @@ const TxnForm = ({route, navigation}) => {
   const [to, setTo] = useState('');
   const [contentLoading, setContentLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const windowHeight = Dimensions.get('window').height;
-  const backdropTop = useRef(new Animated.Value(windowHeight)).current;
-  const actionbarTop = useRef(new Animated.Value(windowHeight)).current;
-
-  // useEffect(() => {
-  //     setContentLoading(true);
-  //     (async () => {
-  //       try {
-  //         const currentUser = await firebase.auth().currentUser.uid;
-  //         const txnDetails = await firestore()
-  //           .collection('transactions')
-  //           .doc(currentUser)
-  //           .collection('txns')
-  //           .doc(route.params?.txnId)
-  //           .get();
-  //         if (txnDetails) {
-  //           const data = txnDetails._data;
-  //           if (data.category === 'Transfer') {
-  //             setFrom(data.from);
-  //             setTo(data.to);
-  //           }
-  //           setTitle(data.title);
-  //           setAmount(data.amount);
-  //           setCategory(data.category);
-  //         }
-  //       } catch (err) {
-  //         console.log(err);
-  //       }
-  //       setContentLoading(false);
-  //     })();
-  //   }, []);
-
+  const [actionBarVisibility, setActionBarVisibility] = useState(false);
   const [errors, setErrors] = useState({
     title: '',
     amount: '',
@@ -66,34 +32,6 @@ const TxnForm = ({route, navigation}) => {
     from: '',
     to: '',
   });
-
-  const handleActionbarClose = () => {
-    navigation.setOptions({tabBarVisible: true});
-    Animated.timing(backdropTop, {
-      duration: 200,
-      toValue: windowHeight,
-      useNativeDriver: false,
-    }).start();
-    Animated.timing(actionbarTop, {
-      duration: 200,
-      toValue: windowHeight,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const handleActionbarOpen = () => {
-    navigation.setOptions({tabBarVisible: false});
-    Animated.timing(backdropTop, {
-      duration: 100,
-      toValue: 0,
-      useNativeDriver: false,
-    }).start();
-    Animated.timing(actionbarTop, {
-      duration: 100,
-      toValue: windowHeight - 300,
-      useNativeDriver: false,
-    }).start();
-  };
 
   const resetForm = () => {
     setTitle('');
@@ -218,7 +156,7 @@ const TxnForm = ({route, navigation}) => {
               </View>
               <TouchableOpacity
                 style={{paddingVertical: 20}}
-                onPress={handleActionbarOpen}>
+                onPress={() => setActionBarVisibility(true)}>
                 <View>
                   <Text style={{color: 'gray', fontSize: 14}}>
                     {category} {'>'}
@@ -232,7 +170,7 @@ const TxnForm = ({route, navigation}) => {
               }[category]
             }
             <CustomTextInput
-              helperText="Amount in $"
+              helperText={'Amount in Rs'}
               placeholder="Amount"
               errorText={errors.amount}
               value={amount.toString()}
@@ -268,24 +206,16 @@ const TxnForm = ({route, navigation}) => {
           </View>
         )}
       </ScrollView>
-
-      <TouchableWithoutFeedback onPress={handleActionbarClose}>
-        <Animated.View style={[styles.backdrop, {top: backdropTop}]} />
-      </TouchableWithoutFeedback>
-      <Animated.View
-        style={[
-          styles.bottomActionBarContainer,
-          {
-            top: actionbarTop,
-          },
-        ]}>
+      <BottomActionBar
+        visibility={actionBarVisibility}
+        backdropPressHandler={() => setActionBarVisibility(false)}>
         {txnCategories.map((cat, index) => (
           <TouchableOpacity
             key={index}
             style={[styles.categories]}
             onPress={() => {
               setCategory(cat);
-              handleActionbarClose();
+              setActionBarVisibility(false);
             }}>
             <Text
               style={[
@@ -296,32 +226,12 @@ const TxnForm = ({route, navigation}) => {
             </Text>
           </TouchableOpacity>
         ))}
-      </Animated.View>
+      </BottomActionBar>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  backdrop: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#111111',
-    opacity: 0.5,
-  },
-  bottomActionBarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#ffffff',
-    top: Dimensions.get('window').height - 100,
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    justifyContent: 'center',
-  },
   categories: {
     paddingVertical: 10,
     alignSelf: 'stretch',
