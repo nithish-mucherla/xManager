@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1007679050830",
+    "project_id": "xmanager-41e3e",
+    "storage_bucket": "xmanager-41e3e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007679050830:android:a1094f44d79204136a5f1f",
+        "android_client_info": {
+          "package_name": "com.xmanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1007679050830-iifgocfjmmd5tvkac7fc21lhl0hbc1m2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUCyCwHcoHfFMQv8GjnJvWwdWVTZvWvr0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1007679050830-iifgocfjmmd5tvkac7fc21lhl0hbc1m2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
