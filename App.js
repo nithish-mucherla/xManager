@@ -8,6 +8,7 @@ import HomeScreenStack from './screens/home/home';
 import {createStackNavigator} from '@react-navigation/stack';
 import SuccessScreen from './screens/successScreen.js';
 import TxnInfo from './screens/txnInfo/TxnInfo.js';
+import EditTxn from './screens/editTxn';
 
 const HomeStack = createStackNavigator();
 
@@ -42,22 +43,13 @@ export default function App() {
     );
   return (
     <NavigationContainer>
-      <HomeStack.Navigator initialRouteName="Home">
-        <HomeStack.Screen
-          name="Home"
-          component={HomeScreenStack}
-          options={{headerShown: false}}
-        />
-        <HomeStack.Screen
-          name="TxnSuccess"
-          component={SuccessScreen}
-          options={{headerShown: false}}
-        />
-        <HomeStack.Screen
-          name="TxnInfo"
-          component={TxnInfo}
-          options={{headerShown: false}}
-        />
+      <HomeStack.Navigator
+        initialRouteName="Home"
+        screenOptions={{headerShown: false}}>
+        <HomeStack.Screen name="Home" component={HomeScreenStack} />
+        <HomeStack.Screen name="TxnSuccess" component={SuccessScreen} />
+        <HomeStack.Screen name="TxnInfo" component={TxnInfo} />
+        <HomeStack.Screen name="EditTxn" component={EditTxn} />
       </HomeStack.Navigator>
     </NavigationContainer>
   );

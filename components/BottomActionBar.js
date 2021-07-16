@@ -21,12 +21,12 @@ const BottomActionBar = ({
   }, [visibility]);
   const handleActionbarClose = () => {
     Animated.timing(backdropTop, {
-      duration: 200,
+      duration: 300,
       toValue: windowHeight,
       useNativeDriver: false,
     }).start();
     Animated.timing(actionbarTop, {
-      duration: 200,
+      duration: 300,
       toValue: windowHeight,
       useNativeDriver: false,
     }).start();

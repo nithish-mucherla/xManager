@@ -3,8 +3,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Button from '../components/Button';
 import {View, Text} from 'react-native';
 import globalStyles from '../App.component.styles';
+import {useNavigationState} from '@react-navigation/native';
 
-const SuccessScreen = ({navigation}) => {
+const SuccessScreen = ({route, navigation}) => {
+  const state = useNavigationState(state => state);
   return (
     <View
       style={[
@@ -12,7 +14,9 @@ const SuccessScreen = ({navigation}) => {
         {alignItems: 'center', justifyContent: 'center'},
       ]}>
       <Ionicons name="checkmark-done-circle-sharp" color="green" size={200} />
-      <Text style={globalStyles.headerText}>Transaction Successful</Text>
+      <Text style={globalStyles.headerText}>
+        {route.params?.successMessage}
+      </Text>
       <Button
         stylesObj={{alignSelf: 'stretch'}}
         title="View Transactions"
@@ -21,7 +25,12 @@ const SuccessScreen = ({navigation}) => {
       <Button
         stylesObj={{alignSelf: 'stretch', backgroundColor: '#111111'}}
         title="New Transaction"
-        onPressHandler={() => navigation.navigate('Home', {screen: 'TxnForm'})}
+        onPressHandler={() => {
+          navigation.navigate('Home', {
+            screen: 'TxnForm',
+            params: {txnType: 'new', txnId: ''},
+          });
+        }}
       />
     </View>
   );

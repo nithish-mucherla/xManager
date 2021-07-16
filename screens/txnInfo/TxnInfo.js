@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import globalStyles from '../../App.component.styles';
 import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/auth';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const TxnInfo = ({route, navigation}) => {
   const [loading, setLoading] = useState(true);
@@ -47,7 +48,7 @@ const TxnInfo = ({route, navigation}) => {
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [route.params?.txnId]);
 
   return (
     <View style={globalStyles.mainContainer}>
@@ -95,15 +96,14 @@ const TxnInfo = ({route, navigation}) => {
             <TouchableOpacity
               style={styles.actionItem}
               onPress={() =>
-                navigation.navigate('Home', {
-                  screen: 'TxnForm',
-                  params: {txnType: 'edit', txnDetails: txnDetails},
-                })
+                navigation.navigate('EditTxn', {txnId: route.params?.txnId})
               }>
-              <Text style={{color: 'white'}}>E</Text>
+              <MaterialIcons color="white" name="edit" size={20} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionItem}>
-              <Text style={{color: 'white'}}>D</Text>
+            <TouchableOpacity
+              style={styles.actionItem}
+              onPress={() => navigation.navigate('Home', {screen: 'TxnList'})}>
+              <MaterialIcons color="white" name="delete" size={20} />
             </TouchableOpacity>
           </View>
         </>

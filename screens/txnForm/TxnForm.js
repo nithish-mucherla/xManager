@@ -22,7 +22,6 @@ const TxnForm = ({route, navigation}) => {
   const [category, setCategory] = useState('Income');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
-  const [contentLoading, setContentLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [actionBarVisibility, setActionBarVisibility] = useState(false);
   const [errors, setErrors] = useState({
@@ -38,6 +37,7 @@ const TxnForm = ({route, navigation}) => {
     setAmount('');
     setFrom('');
     setTo('');
+    setCategory('Income');
   };
 
   const txnCategories = ['Income', 'Expense', 'Transfer'];
@@ -69,7 +69,7 @@ const TxnForm = ({route, navigation}) => {
     );
   };
 
-  const handleTxnSubmit = async () => {
+  const validateForm = () => {
     let errorObj = {title: '', amount: '', category: '', from: '', to: ''};
     if (category === 'Transfer') {
       if (!from) errorObj.from = 'From entity must be provided!';
@@ -82,7 +82,14 @@ const TxnForm = ({route, navigation}) => {
       !errorObj.category &&
       !errorObj.from &&
       !errorObj.to
-    ) {
+    )
+      return [true, errorObj];
+    return [false, errorObj];
+  };
+
+  const handleCreateTxn = async () => {
+    const [isValid, errorObject] = validateForm();
+    if (isValid) {
       setLoading(true);
       let uid = firebase.auth().currentUser.uid;
       try {
@@ -111,13 +118,15 @@ const TxnForm = ({route, navigation}) => {
             });
         if (response) {
           resetForm();
-          navigation.navigate('TxnSuccess');
+          navigation.navigate('TxnSuccess', {
+            successMessage: 'Transaction Added Successfully',
+          });
         }
       } catch (error) {
         console.log(error);
       }
       setLoading(false);
-    } else setErrors(errorObj);
+    } else setErrors(errorObject);
   };
 
   return (
@@ -130,91 +139,85 @@ const TxnForm = ({route, navigation}) => {
             all your transactions!
           </Text>
         </View>
-        {contentLoading ? (
-          <View
-            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <Image
-              source={require('../loader.gif')}
-              style={{height: 40, width: 40}}
-            />
-          </View>
-        ) : (
-          <View style={{alignSelf: 'stretch'}}>
-            <CustomTextInput
-              helperText="Title"
-              placeholder="Title"
-              errorText={errors.title}
-              value={title}
-              onChangeTextHandler={text => {
-                setTitle(text);
-                setErrors({...errors, title: ''});
-              }}
-            />
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <View style={{flex: 1}}>
-                <Text style={{color: 'white', fontSize: 14}}>Category</Text>
-              </View>
-              <TouchableOpacity
-                style={{paddingVertical: 20}}
-                onPress={() => setActionBarVisibility(true)}>
-                <View>
-                  <Text style={{color: 'gray', fontSize: 14}}>
-                    {category} {'>'}
-                  </Text>
-                </View>
-              </TouchableOpacity>
+        <View style={{alignSelf: 'stretch'}}>
+          <CustomTextInput
+            helperText="Title"
+            placeholder="Title"
+            errorText={errors.title}
+            value={title}
+            onChangeTextHandler={text => {
+              setTitle(text);
+              setErrors({...errors, title: ''});
+            }}
+          />
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{flex: 1}}>
+              <Text style={{color: 'white', fontSize: 14}}>Category</Text>
             </View>
-            {
-              {
-                Transfer: TransferTxnComponent(),
-              }[category]
-            }
-            <CustomTextInput
-              helperText={'Amount in Rs'}
-              placeholder="Amount"
-              errorText={errors.amount}
-              value={amount.toString()}
-              keyboardType="numeric"
-              onChangeTextHandler={amount => {
-                setAmount(amount);
-                setErrors({...errors, amount: ''});
-              }}
-            />
-            <Button
-              image={
-                loading && (
-                  <Image
-                    source={require('../loader.gif')}
-                    style={{width: 20, height: 20}}
-                  />
-                )
-              }
-              title={!loading && 'ADD'}
-              disabled={(() => {
-                let basicCheck =
-                  !title.trim() ||
-                  !title.trim().length > 0 ||
-                  !amount ||
-                  loading;
-                return category === 'Transfer'
-                  ? basicCheck || !from || !to
-                  : basicCheck;
-              })()}
-              loading={loading}
-              onPressHandler={handleTxnSubmit}
-            />
+            <TouchableOpacity
+              style={{paddingVertical: 20}}
+              onPress={() => {
+                navigation.setOptions({tabBarVisible: false});
+                setActionBarVisibility(true);
+              }}>
+              <View>
+                <Text style={{color: 'gray', fontSize: 14}}>
+                  {category} {'>'}
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
-        )}
+          {
+            {
+              Transfer: TransferTxnComponent(),
+            }[category]
+          }
+          <CustomTextInput
+            helperText={'Amount in Rs'}
+            placeholder="Amount"
+            errorText={errors.amount}
+            value={amount.toString()}
+            keyboardType="numeric"
+            onChangeTextHandler={amount => {
+              setAmount(amount);
+              setErrors({...errors, amount: ''});
+            }}
+          />
+          <Button
+            image={
+              loading && (
+                <Image
+                  source={require('../loader.gif')}
+                  style={{width: 20, height: 20}}
+                />
+              )
+            }
+            title={!loading && 'ADD'}
+            disabled={(() => {
+              let basicCheck =
+                !title.trim() || !title.trim().length > 0 || !amount || loading;
+              return category === 'Transfer'
+                ? basicCheck || !from || !to
+                : basicCheck;
+            })()}
+            loading={loading}
+            onPressHandler={handleCreateTxn}
+          />
+        </View>
       </ScrollView>
       <BottomActionBar
         visibility={actionBarVisibility}
-        backdropPressHandler={() => setActionBarVisibility(false)}>
+        backdropPressHandler={() => {
+          navigation.setOptions({tabBarVisible: true});
+          setActionBarVisibility(false);
+        }}>
         {txnCategories.map((cat, index) => (
           <TouchableOpacity
             key={index}
             style={[styles.categories]}
             onPress={() => {
               setCategory(cat);
+              navigation.setOptions({tabBarVisible: true});
               setActionBarVisibility(false);
             }}>
             <Text
