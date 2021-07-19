@@ -8,6 +8,7 @@ import {
   ScrollView,
   StyleSheet,
   Image,
+  Alert,
 } from 'react-native';
 import globalStyles from '../App.component.styles';
 import firestore from '@react-native-firebase/firestore';
@@ -158,11 +159,21 @@ const TxnForm = ({route, navigation}) => {
     );
   };
 
+  const cancelEdit = () => {
+    Alert.alert('', 'Discard changes?', [
+      {text: 'Cancel', style: 'cancel', onPress: () => {}},
+      {
+        text: 'OK',
+        onPress: () => navigation.goBack(),
+      },
+    ]);
+  };
+
   return (
     <View style={globalStyles.mainContainer}>
       <ScrollView>
         <View style={styles.headerBar}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={cancelEdit}>
             <Ionicons name="md-close" color="white" size={30} />
           </TouchableOpacity>
           <View style={styles.headerBarCenter}>
@@ -192,7 +203,7 @@ const TxnForm = ({route, navigation}) => {
             />
           </View>
         ) : (
-          <View style={{alignSelf: 'stretch', paddingTop: '25%'}}>
+          <View style={{alignSelf: 'stretch', paddingTop: 20}}>
             <CustomTextInput
               helperText="Title"
               placeholder="Title"

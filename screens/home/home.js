@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View, StatusBar} from 'react-native';
 import TxnContainer from '../txnContainer/TxnContainer.js';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -8,16 +8,44 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import TxnForm from '../txnForm/TxnForm';
 import Profile from '../profile/profile';
+import FlashText from '../../components/FlashText';
 
 const Tabs = createBottomTabNavigator();
 
 const TxnList = ({route, navigation}) => {
+  const [flashText, setFlashText] = useState({
+    text: '',
+    isVisible: false,
+  });
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (route.params?.flashText) {
+        setFlashText({
+          text: route.params?.flashText,
+          isVisible: true,
+        });
+        setTimeout(
+          () =>
+            setFlashText({
+              text: '',
+              isVisible: false,
+            }),
+          3000,
+        );
+        navigation.setParams({flashText: ''});
+      }
+    });
+    return unsubscribe;
+  }, [route.params?.flashText]);
+
   return (
     <View style={{flex: 1, backgroundColor: '#111111'}}>
       <StatusBar backgroundColor="#111111" barStyle="light-content" />
       <View style={styles.headerView}>
         <Text style={styles.brandText}>XM</Text>
       </View>
+      <FlashText text={flashText.text} isVisible={flashText.isVisible} />
       <TxnContainer navigation={navigation} />
     </View>
   );
@@ -40,13 +68,13 @@ const HomeScreenStack = ({navigation}) => {
           if (route.name === 'TxnList') {
             iconName = focused ? 'home' : 'home-outline';
             return (
-              <MaterialCommunityIcons name={iconName} size={30} color="white" />
+              <MaterialCommunityIcons name={iconName} size={28} color="white" />
             );
           } else if (route.name === 'TxnForm') {
             iconName = focused ? 'add-circle' : 'add-circle-outline';
-            return <Ionicons name={iconName} size={30} color="white" />;
+            return <Ionicons name={iconName} size={28} color="white" />;
           } else if (route.name === 'Profile') {
-            iconName = focused ? 'user' : 'user-o';
+            iconName = focused ? 'user-circle' : 'user-circle-o';
             return <FontAwesome name={iconName} size={25} color="white" />;
           }
         },

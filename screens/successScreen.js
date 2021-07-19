@@ -6,6 +6,7 @@ import globalStyles from '../App.component.styles';
 import {useNavigationState} from '@react-navigation/native';
 
 const SuccessScreen = ({route, navigation}) => {
+  console.log(route.params);
   const state = useNavigationState(state => state);
   return (
     <View
@@ -20,16 +21,13 @@ const SuccessScreen = ({route, navigation}) => {
       <Button
         stylesObj={{alignSelf: 'stretch'}}
         title="View Transactions"
-        onPressHandler={() => navigation.navigate('Home', {screen: 'TxnList'})}
+        onPressHandler={() => navigation.navigate('TxnList')}
       />
       <Button
         stylesObj={{alignSelf: 'stretch', backgroundColor: '#111111'}}
         title="New Transaction"
         onPressHandler={() => {
-          navigation.navigate('Home', {
-            screen: 'TxnForm',
-            params: {txnType: 'new', txnId: ''},
-          });
+          navigation.navigate('TxnForm');
         }}
       />
     </View>

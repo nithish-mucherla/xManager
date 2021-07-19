@@ -1,5 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import globalStyles from '../../App.component.styles';
 import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/auth';
@@ -50,6 +58,33 @@ const TxnInfo = ({route, navigation}) => {
     }
   }, [route.params?.txnId]);
 
+  const deleteTxn = async () => {
+    let uid = firebase.auth().currentUser.uid;
+    try {
+      await firestore()
+        .collection('transactions')
+        .doc(uid)
+        .collection('txns')
+        .doc(route.params?.txnId)
+        .delete();
+      navigation.navigate('TxnList', {
+        flashText: 'Deleted',
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const confirmDelete = () => {
+    Alert.alert('', 'Delete the transaction?', [
+      {text: 'Cancel', style: 'cancel', onPress: () => {}},
+      {
+        text: 'OK',
+        onPress: deleteTxn,
+      },
+    ]);
+  };
+
   return (
     <View style={globalStyles.mainContainer}>
       {loading ? (
@@ -75,21 +110,24 @@ const TxnInfo = ({route, navigation}) => {
               </Text>
             </View>
             <View style={styles.detailsContainer}>
-              <Text style={globalStyles.subText}>{txnDetails.category}</Text>
-              {txnDetails.category === 'Transfer' && (
-                <>
-                  <Text style={globalStyles.subText}>
-                    From: {txnDetails.from}
-                    {'  '}
+              <ScrollView
+                contentContainerStyle={{justifyContent: 'center', flexGrow: 1}}>
+                <Text style={globalStyles.subText}>{txnDetails.category}</Text>
+                {txnDetails.category === 'Transfer' && (
+                  <>
                     <Text style={globalStyles.subText}>
-                      To: {txnDetails.to}
+                      From: {txnDetails.from}
+                      {'  '}
+                      <Text style={globalStyles.subText}>
+                        To: {txnDetails.to}
+                      </Text>
                     </Text>
-                  </Text>
-                </>
-              )}
-              <Text style={globalStyles.headerText}>
-                &#x20b9; {txnDetails.amount}
-              </Text>
+                  </>
+                )}
+                <Text style={globalStyles.headerText}>
+                  &#x20b9; {txnDetails.amount}
+                </Text>
+              </ScrollView>
             </View>
           </View>
           <View style={styles.actionContainer}>
@@ -100,9 +138,7 @@ const TxnInfo = ({route, navigation}) => {
               }>
               <MaterialIcons color="white" name="edit" size={20} />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={() => navigation.navigate('Home', {screen: 'TxnList'})}>
+            <TouchableOpacity style={styles.actionItem} onPress={confirmDelete}>
               <MaterialIcons color="white" name="delete" size={20} />
             </TouchableOpacity>
           </View>
@@ -115,8 +151,7 @@ const TxnInfo = ({route, navigation}) => {
 const styles = StyleSheet.create({
   txnInfo: {
     flex: 1,
-    marginHorizontal: 20,
-    marginVertical: 40,
+    margin: 10,
   },
   actionContainer: {
     flexDirection: 'row',
@@ -132,11 +167,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    paddingHorizontal: 20,
   },
   detailsContainer: {
     flex: 2,
-    justifyContent: 'center',
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
     backgroundColor: '#212121',
